@@ -9,3 +9,5 @@
 /FileMonitorTests/obj/*
 /FileSystemEventsHandler/bin/*
 /FileSystemEventsHandler/obj/*
+/FileSystemRegistrator/bin/*
+/FileSystemRegistrator/obj/*

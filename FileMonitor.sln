@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileMonitorTests", "FileMon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemEventsHandler", "FileSystemEventsHandler\FileSystemEventsHandler.csproj", "{3BEBFEC6-A387-4CE8-A07F-7D1557CEF709}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemRegistrator", "FileSystemRegistrator\FileSystemRegistrator.csproj", "{72F677EC-883B-4ACE-80EC-B9D28669B2FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3BEBFEC6-A387-4CE8-A07F-7D1557CEF709}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BEBFEC6-A387-4CE8-A07F-7D1557CEF709}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BEBFEC6-A387-4CE8-A07F-7D1557CEF709}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F677EC-883B-4ACE-80EC-B9D28669B2FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F677EC-883B-4ACE-80EC-B9D28669B2FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F677EC-883B-4ACE-80EC-B9D28669B2FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F677EC-883B-4ACE-80EC-B9D28669B2FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
