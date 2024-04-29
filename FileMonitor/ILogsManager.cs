@@ -2,7 +2,9 @@
 {
     public interface ILogsManager
     {
-        void Write(string directoryPath, EventLog eventLogMsg);
-        void RemoveMonitor(string directoryPath);
+        void AddEventLogToCache(EventLog eventLog);
+        IEnumerable<EventLog> PrintLastEvents(int NumberOfLastEventsToPrint);
+
+        // TODO implement the 2 other functions
     }
 }

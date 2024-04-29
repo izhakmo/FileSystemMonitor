@@ -1,6 +1,5 @@
 ﻿namespace FileMonitor
 {
-
     // TODO need to test class
     public class LogsManager : ILogsManager
     {
@@ -13,27 +12,27 @@
             _logsByPathByChangeTypes = new Dictionary<string, Dictionary<string, Stack<EventLog>>>();
         }
 
-        public void Write(string directoryPath, EventLog eventLogMsg)
+        public void AddEventLogToCache(EventLog eventLog)
         {
-            _allEventLogs.Push(eventLogMsg);
+            _allEventLogs.Push(eventLog);
 
-            if (_logsByPathByChangeTypes.TryGetValue(directoryPath, out Dictionary<string, Stack<EventLog>>? _logsForPathDict))
+            if (_logsByPathByChangeTypes.TryGetValue(eventLog.FolderPath, out Dictionary<string, Stack<EventLog>>? _logsForPathDict))
             {
                 _logsForPathDict.TryGetValue(Consts.AllLogsForFolderKey, out Stack<EventLog> allLogsForPath);
-                allLogsForPath.Push(eventLogMsg);
+                allLogsForPath.Push(eventLog);
 
-                if (_logsForPathDict.TryGetValue(eventLogMsg.GetChangeType(), out Stack<EventLog> logsByChangeType))
+                if (_logsForPathDict.TryGetValue(eventLog.GetChangeType(), out Stack<EventLog> logsByChangeType))
                 {
-                    logsByChangeType.Push(eventLogMsg);
+                    logsByChangeType.Push(eventLog);
                 }
 
                 // first log for changeType for this path
                 else
                 {
                     logsByChangeType = new Stack<EventLog>();
-                    logsByChangeType.Push(eventLogMsg);
+                    logsByChangeType.Push(eventLog);
 
-                    _logsForPathDict.Add(eventLogMsg.GetChangeType(), logsByChangeType);
+                    _logsForPathDict.Add(eventLog.GetChangeType(), logsByChangeType);
                 }
             }
 
@@ -41,31 +40,25 @@
             else
             {
                 var allLogsForPath = new Stack<EventLog>();
-                allLogsForPath.Push(eventLogMsg);
+                allLogsForPath.Push(eventLog);
 
                 var logsForPathByChangeType = new Stack<EventLog>();
-                logsForPathByChangeType.Push(eventLogMsg);
+                logsForPathByChangeType.Push(eventLog);
 
                 _logsForPathDict = new Dictionary<string, Stack<EventLog>>
                 {
                     { Consts.AllLogsForFolderKey, allLogsForPath },
-                    { eventLogMsg.GetChangeType(), logsForPathByChangeType }
+                    { eventLog.GetChangeType(), logsForPathByChangeType }
                 };
 
-                _logsByPathByChangeTypes.Add(directoryPath, _logsForPathDict);
+                _logsByPathByChangeTypes.Add(eventLog.FolderPath, _logsForPathDict);
             }
         }
 
-        public void RemoveMonitor(string directoryPath)
+
+        public IEnumerable<EventLog> PrintLastEvents(int NumberOfLastEventsToPrint)
         {
-            if (_logsByPathByChangeTypes.TryGetValue(directoryPath, out Dictionary<string, Stack<EventLog>>? _logsByEventType))
-            {
-                foreach (var a in _logsByEventType)
-                {
-                    _logsByEventType.Remove(a.Key);
-                    a.Value.Clear();
-                }
-            }
+            return _allEventLogs.Take(NumberOfLastEventsToPrint);
         }
     }
 }

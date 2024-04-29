@@ -1,3 +1,4 @@
+using FileMonitor;
 using FileMonitor.Implementations;
 using FileMonitor.Interfaces;
 
@@ -11,7 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // TODO DI - bootstrap or autofac
-builder.Services.AddSingleton<IPrintEventLogs>(_ => new PrintEventLogs());
+builder.Services.AddSingleton<ILogsManager, LogsManager>();
+builder.Services.AddSingleton<IPrintEventLogs, PrintEventLogs>();
 
 var app = builder.Build();
 
