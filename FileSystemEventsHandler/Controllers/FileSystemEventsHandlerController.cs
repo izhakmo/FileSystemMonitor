@@ -31,11 +31,12 @@ namespace FileSystemEventsHandler.Controllers
             return _printEventLogs.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint);
         }
 
-        [HttpGet("PrintFolderLastEvents")]
-        public IEnumerable<string> PrintFolderLastEvents(string folderPath, string eventType, int NumberOfLastEventsToPrint)
+        [HttpGet("PrintFolderLastEventsOfType")]
+        public IEnumerable<string> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
-            return _printEventLogs.PrintFolderLastEvents(folderPath, eventType, NumberOfLastEventsToPrint);
+            return _printEventLogs.PrintFolderLastEventsOfType(folderPath, eventType, NumberOfLastEventsToPrint);
         }
+
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("PostEventLog")]

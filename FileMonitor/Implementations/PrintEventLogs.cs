@@ -14,7 +14,7 @@ namespace FileMonitor.Implementations
             throw new NotImplementedException();
         }
 
-        public IEnumerable<string> PrintFolderLastEvents(string folderPath, string eventType, int NumberOfLastEventsToPrint)
+        public IEnumerable<string> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
             throw new NotImplementedException();
         }

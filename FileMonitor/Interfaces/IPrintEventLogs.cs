@@ -11,7 +11,7 @@
 
 
         // return fileName (string), eventDate (date)
-        IEnumerable<string> PrintFolderLastEvents(string folderPath, string eventType, int NumberOfLastEventsToPrint);
+        IEnumerable<string> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint);
 
 
         // TODO UTs
