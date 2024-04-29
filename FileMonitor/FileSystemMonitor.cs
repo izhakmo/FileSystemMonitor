@@ -1,5 +1,7 @@
 ﻿using log4net.Config;
 using log4net;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace FileMonitor
 {
@@ -8,13 +10,12 @@ namespace FileMonitor
         private readonly ILog log = LogManager.GetLogger(typeof(FileSystemMonitor));
         private FileSystemWatcher _watcher;
 
-        //private ILogsManager _logsManager;
         private readonly string _directoryPath;
+        // TODO configure the URL
+        private readonly string _postEventUrl = "https://localhost:7174/FileSystemEventsHandler/PostEventLog";
 
 
-        public FileSystemMonitor(string directoryPath
-            //, ILogsManager logsManager
-            )
+        public FileSystemMonitor(string directoryPath)
         {
             BasicConfigurator.Configure();
 
@@ -23,8 +24,6 @@ namespace FileMonitor
 
             _directoryPath = directoryPath;
             _watcher = new FileSystemWatcher(_directoryPath);
-            //_logsManager = logsManager;
-
             StartMonitoring();
         }
 
@@ -37,11 +36,11 @@ namespace FileMonitor
             _watcher = new FileSystemWatcher(_directoryPath);
 
             // Set the event handlers
-            _watcher.Created += OnFileChange;
-            _watcher.Deleted += OnFileChange;
-            _watcher.Changed += OnFileChange;
+            _watcher.Created += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
+            _watcher.Deleted += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
+            _watcher.Changed += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
 
-            _watcher.Renamed += OnFileRename;
+            _watcher.Renamed += (sender, e) => { _ = OnFileRenameAsync(sender, e); };
 
             _watcher.EnableRaisingEvents = true;
         }
@@ -52,38 +51,67 @@ namespace FileMonitor
 
             _watcher.EnableRaisingEvents = false;
 
-            _watcher.Created -= OnFileChange;
-            _watcher.Deleted -= OnFileChange;
-            _watcher.Changed -= OnFileChange;
+            _watcher.Created -= (sender, e) => { _ = OnFileChangeAsync(sender, e); };
+            _watcher.Deleted -= (sender, e) => { _ = OnFileChangeAsync(sender, e); };
+            _watcher.Changed -= (sender, e) => { _ = OnFileChangeAsync(sender, e); };
 
-            _watcher.Renamed -= OnFileRename;
-
-            // TODO post remove monitor 
-            //_logsManager.RemoveMonitor(_directoryPath);
+            _watcher.Renamed -= (sender, e) => { _ = OnFileRenameAsync(sender, e); };
 
             // TODO do i need to dispose????
             _watcher.Dispose();
         }
 
-        private void OnFileChange(object sender, FileSystemEventArgs e)
+        private async Task OnFileChangeAsync(object sender, FileSystemEventArgs e)
         {
-            PostFileEventLog(e.ChangeType, e.FullPath, string.Empty);
+            await PostFileEventLog(e.ChangeType, e.FullPath, string.Empty);
         }
 
-        private void OnFileRename(object sender, RenamedEventArgs e)
+        private async Task OnFileRenameAsync(object sender, RenamedEventArgs e)
         {
             string logMsg = $"old fileName: {e.OldName}, oldFullPath: {e.OldFullPath}.";
-            PostFileEventLog(e.ChangeType, e.FullPath, logMsg);
+            await PostFileEventLog(e.ChangeType, e.FullPath, logMsg);
         }
 
-        private void PostFileEventLog(WatcherChangeTypes ChangeType, string filePath, string logMsg)
+        private async Task PostFileEventLog(WatcherChangeTypes ChangeType, string filePath, string logMsg)
         {
 
-            EventLogMsg eventLogMsg = new EventLogMsg(ChangeType, filePath, logMsg);
-            log.Info($"[{nameof(PostFileEventLog)}] eventLogMsg: {eventLogMsg}.");
+            EventLog eventLog = new EventLog(ChangeType, filePath, logMsg);
+            log.Info($"[{nameof(PostFileEventLog)}] eventLog: {eventLog}.");
 
-            //_logsManager.Write(_directoryPath, eventLogMsg);
-            // TODO postEvent
+            await SendPostRequest(eventLog);
+        }
+
+        private async Task SendPostRequest(EventLog eventLog)
+        {
+            string eventLogAsjson = JsonConvert.SerializeObject(eventLog);
+            
+            using (var client = new HttpClient())
+            {
+                HttpContent content = new StringContent(eventLogAsjson, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    HttpResponseMessage response = await client.PostAsync(_postEventUrl, content);
+
+                    // Check if the request was successful
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Read response content as string
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        Console.WriteLine("Response: " + responseBody);
+                    }
+                    else
+                    {
+                        // Print error status code
+                        Console.WriteLine("Error: " + response.StatusCode);
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    // Print any exception that occurred
+                    Console.WriteLine("Error: " + e.Message);
+                }
+            }
         }
     }
 }

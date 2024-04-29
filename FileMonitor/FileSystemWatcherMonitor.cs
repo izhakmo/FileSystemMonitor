@@ -11,9 +11,7 @@ namespace FileMonitor
         private int _maxNumberOfFoldersToMonitor;
         private Dictionary<string, FileSystemMonitor> _pathToMonitor;
 
-        private ILogsManager _logsManager;
-
-        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor, ILogsManager logsManager)
+        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor)
         {
             if (maxNumberOfFoldersToMonitor < 1)
             {
@@ -22,7 +20,6 @@ namespace FileMonitor
 
             _maxNumberOfFoldersToMonitor = maxNumberOfFoldersToMonitor;
             _pathToMonitor = new Dictionary<string, FileSystemMonitor>();
-            _logsManager = logsManager;
         }
 
         public HttpResponseMessage AddFolder(string folderPath)

@@ -2,7 +2,7 @@
 {
     public interface ILogsManager
     {
-        void Write(string directoryPath, EventLogMsg eventLogMsg);
+        void Write(string directoryPath, EventLog eventLogMsg);
         void RemoveMonitor(string directoryPath);
     }
 }

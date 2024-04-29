@@ -9,8 +9,7 @@ namespace DirectoryWatcher
         {
             string directoryPath = @"C:\Users\izhak\Downloads\dasdasdasd";
             //BasicConfigurator.Configure();
-            FileSystemMonitor monitor = new FileSystemMonitor(directoryPath, new LogsManager());
-            monitor.StartMonitoring();
+            FileSystemMonitor monitor = new FileSystemMonitor(directoryPath);
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();

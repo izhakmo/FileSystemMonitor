@@ -1,6 +1,6 @@
 ﻿namespace FileMonitor
 {
-    public class EventLogMsg
+    public class EventLog
     {
         public DateTime Time { get; set; }
         public string ChangeType { get; set; }
@@ -9,12 +9,13 @@
 
         public string LogMsg { get; set; }
 
-        public EventLogMsg() { } // Parameterless constructor for serialization / deserialization 
+        public EventLog() { } // Parameterless constructor for serialization / deserialization 
 
-        public EventLogMsg(WatcherChangeTypes ChangeType, string filePath, string logMsg)
+        public EventLog(WatcherChangeTypes changeType, string filePath, string logMsg)
         {
+            // TODO
             Time = DateTime.Now;
-            this.ChangeType = ChangeType.GetType().Name;
+            ChangeType = changeType.ToString();
             FolderPath = Path.GetDirectoryName(filePath);
             FileName = Path.GetFileName(filePath);
             LogMsg = logMsg;
