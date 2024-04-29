@@ -8,7 +8,9 @@ namespace FileMonitor
         private int _maxNumberOfFoldersToMonitor;
         private Dictionary<string, FileSystemMonitor> _pathToMonitor;
 
-        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor)
+        private ILogsManager _logsManager;
+
+        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor, ILogsManager logsManager)
         {
             if (maxNumberOfFoldersToMonitor < 1)
             {
@@ -17,6 +19,7 @@ namespace FileMonitor
 
             _maxNumberOfFoldersToMonitor = maxNumberOfFoldersToMonitor;
             _pathToMonitor = new Dictionary<string, FileSystemMonitor>();
+            _logsManager = logsManager;
         }
 
         public HttpResponseMessage AddFolder(string folderPath)
@@ -78,12 +81,22 @@ namespace FileMonitor
 
         private void UnmonitorFolder(string folderPathLowerCase)
         {
-            throw new NotImplementedException();
+            // TODO implement
+            _numberOfFolderCurrentlyMonitored--;
+
+            // TODO
+            _pathToMonitor.Remove(folderPathLowerCase);
+            //throw new NotImplementedException();
         }
 
         private void MonitorNewFolder(string folderPathLowerCase)
         {
-            throw new NotImplementedException();
+            // TODO implement
+            _numberOfFolderCurrentlyMonitored++;
+            FileSystemMonitor fileSystemMonitor = new FileSystemMonitor(folderPathLowerCase, _logsManager);
+            //TODO
+            _pathToMonitor.Add(folderPathLowerCase, fileSystemMonitor);
+            //throw new NotImplementedException();
         }
 
         private HttpResponseMessage ReturnMaxNumberOfFoldersMonitoredResponse()

@@ -9,10 +9,12 @@ namespace FileMonitor
         private FileSystemWatcher _watcher;
 
         private ILogsManager _logsManager;
-        //private Dictionary<string, Stack<EventLogMsg>> _logsByChangeTypes;
-
         private readonly string _directoryPath;
+
+
+        //private Dictionary<string, Stack<EventLogMsg>> _logsByChangeTypes;
         //private readonly string _generalLogFileName;
+
 
         public FileSystemMonitor(string directoryPath, ILogsManager logsManager)
         {
@@ -23,6 +25,7 @@ namespace FileMonitor
             _directoryPath = directoryPath;
             _watcher = new FileSystemWatcher(_directoryPath);
             _logsManager = logsManager;
+
 
             //_logsByChangeTypes = new Dictionary<string, Stack<EventLogMsg>>
             //{
@@ -67,6 +70,8 @@ namespace FileMonitor
 
             _logsManager.RemoveMonitor(_directoryPath);
 
+
+
             //foreach (var a in _logsByChangeTypes)
             //{
             //    // TODO do i need to clear the queues and dictionary?
@@ -75,6 +80,8 @@ namespace FileMonitor
             //}
 
             // TODO do i need to dispose????
+
+
             _watcher.Dispose();
         }
 
@@ -96,6 +103,8 @@ namespace FileMonitor
             log.Info($"{eventLogMsg}");
 
             _logsManager.Write(_directoryPath, eventLogMsg);
+
+
 
             //_logsByChangeTypes.TryGetValue(Consts.AllLogsForFolderKey, out Stack<EventLogMsg> allLogsForFolder);
             //allLogsForFolder.Push(eventLogMsg);
