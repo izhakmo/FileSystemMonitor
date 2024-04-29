@@ -1,9 +1,12 @@
-﻿using System.Net;
+﻿using log4net;
+using System.Net;
 
 namespace FileMonitor
 {
     public class FileSystemWatcherMonitor : IFileSystemWatcherMonitor
     {
+        private readonly ILog log = LogManager.GetLogger(typeof(FileSystemWatcherMonitor));
+
         private int _numberOfFolderCurrentlyMonitored = 0;
         private int _maxNumberOfFoldersToMonitor;
         private Dictionary<string, FileSystemMonitor> _pathToMonitor;
@@ -24,32 +27,38 @@ namespace FileMonitor
 
         public HttpResponseMessage AddFolder(string folderPath)
         {
+            log.Info($"[{nameof(AddFolder)}] folderPath: {folderPath}.");
             string folderPathLowerCase = folderPath.ToLower();
             if (_pathToMonitor.ContainsKey(folderPathLowerCase))
             {
                 string folderAlreadyMonitoredMsg = $"folderPath: `{folderPathLowerCase}` is already monitored.";
+                log.Warn($"[{nameof(AddFolder)}] {folderAlreadyMonitoredMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.Conflict) { Content = new StringContent(folderAlreadyMonitoredMsg) };
             }
 
             if (_numberOfFolderCurrentlyMonitored >= _maxNumberOfFoldersToMonitor)
             {
-                return ReturnMaxNumberOfFoldersMonitoredResponse();
+                string maxNumberOfFoldersMonitoredMsg = ReturnMaxNumberOfFoldersMonitoredResponse(folderPathLowerCase);
+                log.Warn($"[{nameof(AddFolder)}] {maxNumberOfFoldersMonitoredMsg}.");
+                return new HttpResponseMessage(HttpStatusCode.Forbidden) { Content = new StringContent(maxNumberOfFoldersMonitoredMsg) };
             }
 
             try
             {
-                // TODO add logic for onboard a monitor
                 MonitorNewFolder(folderPathLowerCase);
+                log.Info($"[{nameof(AddFolder)}] folderPath: `{folderPathLowerCase}` added to Dictionary successfully.");
             }
             catch (ArgumentException ex)
             {
                 var folderDoesNotExistMsg = $"failed to monitor folderPath: `{folderPathLowerCase}`. " +
                 $"folder probably does not exist. error: {ex.Message}.";
+                log.Warn($"[{nameof(AddFolder)}] {folderDoesNotExistMsg}. {GetMonitoredFolders()}");
                 return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(folderDoesNotExistMsg) };
             }
             catch (Exception ex)
             {
                 var errorMsg = $"failed to monitor folderPath: `{folderPathLowerCase}`. error: {ex.Message}.";
+                log.Error($"[{nameof(AddFolder)}] {errorMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(errorMsg) };
             }
 
@@ -59,19 +68,22 @@ namespace FileMonitor
 
         public HttpResponseMessage RemoveFolder(string folderPath)
         {
+            log.Info($"[{nameof(RemoveFolder)}] folderPath: {folderPath}.");
             string folderPathLowerCase = folderPath.ToLower();
             if (!(_pathToMonitor.ContainsKey(folderPathLowerCase)))
             {
-                string folderIsNotMonitoredMsg = $"folderPath: `{folderPathLowerCase}` is not monitored.";
+                string folderIsNotMonitoredMsg = $"folderPath: `{folderPathLowerCase}` is not monitored. {GetMonitoredFolders()}";
                 return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(folderIsNotMonitoredMsg) };
             }
             try
             {
                 UnmonitorFolder(folderPathLowerCase);
+                log.Info($"[{nameof(RemoveFolder)}] folderPath: `{folderPathLowerCase}` removed from Dictionary successfully.");
             }
             catch (Exception ex)
             {
                 var errorMsg = $"failed to unmonitor folderPath: `{folderPathLowerCase}`. error: {ex.Message}.";
+                log.Error($"[{nameof(RemoveFolder)}] {errorMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(errorMsg) };
             }
 
@@ -79,55 +91,41 @@ namespace FileMonitor
             return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(successfulMsg) };
         }
 
-        private void UnmonitorFolder(string folderPathLowerCase)
-        {
-            // TODO implement
-            _numberOfFolderCurrentlyMonitored--;
-
-            // TODO
-            _pathToMonitor.Remove(folderPathLowerCase);
-            //throw new NotImplementedException();
-        }
-
         private void MonitorNewFolder(string folderPathLowerCase)
         {
-            // TODO implement
+            FileSystemMonitor fileSystemMonitor = new FileSystemMonitor(folderPathLowerCase);
             _numberOfFolderCurrentlyMonitored++;
-            FileSystemMonitor fileSystemMonitor = new FileSystemMonitor(folderPathLowerCase, _logsManager);
-            //TODO
+
             _pathToMonitor.Add(folderPathLowerCase, fileSystemMonitor);
-            //throw new NotImplementedException();
         }
 
-        private HttpResponseMessage ReturnMaxNumberOfFoldersMonitoredResponse()
+        private void UnmonitorFolder(string folderPathLowerCase)
+        {
+            bool isFolderMonitored = _pathToMonitor.TryGetValue(folderPathLowerCase, out FileSystemMonitor? fileSystemMonitor);
+            if (isFolderMonitored)
+            {
+                fileSystemMonitor.StopMonitoring();
+                _pathToMonitor.Remove(folderPathLowerCase);
+            }
+            
+            _numberOfFolderCurrentlyMonitored--;
+
+        }
+
+        private string ReturnMaxNumberOfFoldersMonitoredResponse(string folderPathLowerCase)
         {
             var folderpaths = GetMonitoredFolders();
 
-            string contentMsg = $"already monitoring max number of folders allowed " +
+            return $"failed to monitor folderPath: {folderPathLowerCase}.{Environment.NewLine}" +
+                $"already monitoring max number of folders allowed " +
                 $"({_maxNumberOfFoldersToMonitor} folders).{Environment.NewLine}" +
-                $"MonitoredPaths: {folderpaths}.{Environment.NewLine}" +
+                $"{folderpaths}.{Environment.NewLine}" +
                 $"Please unmonitor one of the folders in order to monitor a new folder.";
-
-            // TODO what status code do i want?
-            HttpResponseMessage maxNumberOfFoldersMonitoredMsg = new HttpResponseMessage(HttpStatusCode.Forbidden)
-            {
-                Content = new StringContent(contentMsg)
-            };
-
-            return maxNumberOfFoldersMonitoredMsg;
         }
 
         private string GetMonitoredFolders()
         {
-            return string.Join(Environment.NewLine, _pathToMonitor.Keys);
-
-
-            //string folderPaths = string.Empty;
-            //foreach (var Folderpath in _pathToMonitor.Keys)
-            //{
-            //    folderPaths += Folderpath + Environment.NewLine;
-            //}
-            //return folderPaths;
+            return "MonitoredPaths: " + string.Join(",", _pathToMonitor.Keys) + ".";
         }
     }
 }
