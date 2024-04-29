@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// TODO fix DI
+// TODO fix DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject here
 builder.Services.AddSingleton<IFileSystemWatcherMonitor>(_ => new FileSystemWatcherMonitor(3));
 
 

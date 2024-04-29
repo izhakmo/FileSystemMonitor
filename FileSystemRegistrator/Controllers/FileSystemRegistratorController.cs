@@ -7,15 +7,10 @@ namespace FileSystemRegistrator.Controllers
     [Route("[controller]")]
     public class FileSystemRegistratorController : ControllerBase
     {
-        private readonly ILogger<FileSystemRegistratorController> _logger;
         private IFileSystemWatcherMonitor _fileSystemWatcherMonitor;
 
-        public FileSystemRegistratorController(
-            ILogger<FileSystemRegistratorController> logger, 
-            IFileSystemWatcherMonitor fileSystemWatcherMonitor)
+        public FileSystemRegistratorController(IFileSystemWatcherMonitor fileSystemWatcherMonitor)
         {
-            _logger = logger;
-
             _fileSystemWatcherMonitor = fileSystemWatcherMonitor;
         }
 

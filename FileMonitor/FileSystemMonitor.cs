@@ -11,13 +11,17 @@ namespace FileMonitor
         private FileSystemWatcher _watcher;
 
         private readonly string _directoryPath;
-        // TODO configure the URL
+        
+        // TODO inject the URL, inject log filePath
         private readonly string _postEventUrl = "https://localhost:7174/FileSystemEventsHandler/PostEventLog";
 
 
         public FileSystemMonitor(string directoryPath)
         {
             BasicConfigurator.Configure();
+
+            // Configure log4net
+            //XmlConfigurator.Configure();
 
             // TODO add fileName as input
             //_generalLogFileName = Consts.DefualtGeneralLogFileName;
@@ -29,13 +33,10 @@ namespace FileMonitor
 
         private void StartMonitoring()
         {
-            // Configure log4net
-            //XmlConfigurator.Configure();
             log.Info($"[{nameof(StartMonitoring)}] start monitoring directory: {_directoryPath}");
 
             _watcher = new FileSystemWatcher(_directoryPath);
 
-            // Set the event handlers
             _watcher.Created += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
             _watcher.Deleted += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
             _watcher.Changed += (sender, e) => { _ = OnFileChangeAsync(sender, e); };

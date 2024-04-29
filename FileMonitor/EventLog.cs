@@ -9,11 +9,10 @@
 
         public string LogMsg { get; set; }
 
-        public EventLog() { } // Parameterless constructor for serialization / deserialization 
+        public EventLog() { } // constructor for serialization / deserialization 
 
         public EventLog(WatcherChangeTypes changeType, string filePath, string logMsg)
         {
-            // TODO
             Time = DateTime.Now;
             ChangeType = changeType.ToString();
             FolderPath = Path.GetDirectoryName(filePath);

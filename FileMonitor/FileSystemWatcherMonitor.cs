@@ -11,6 +11,7 @@ namespace FileMonitor
         private int _maxNumberOfFoldersToMonitor;
         private Dictionary<string, FileSystemMonitor> _pathToMonitor;
 
+        // TODO create FileSystemMonitorFactory and inject here
         public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor)
         {
             if (maxNumberOfFoldersToMonitor < 1)
@@ -103,9 +104,8 @@ namespace FileMonitor
             {
                 fileSystemMonitor.StopMonitoring();
                 _pathToMonitor.Remove(folderPathLowerCase);
+                _numberOfFolderCurrentlyMonitored--;
             }
-            
-            _numberOfFolderCurrentlyMonitored--;
 
         }
 
