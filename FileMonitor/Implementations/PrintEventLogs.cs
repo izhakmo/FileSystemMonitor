@@ -1,4 +1,6 @@
-﻿namespace FileMonitor
+﻿using FileMonitor.Interfaces;
+
+namespace FileMonitor.Implementations
 {
     public class PrintEventLogs : IPrintEventLogs
     {

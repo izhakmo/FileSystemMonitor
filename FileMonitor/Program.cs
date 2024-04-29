@@ -1,4 +1,4 @@
-﻿using FileMonitor;
+﻿using FileMonitor.Implementations;
 using log4net.Config;
 
 namespace DirectoryWatcher

@@ -3,7 +3,7 @@ using log4net;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace FileMonitor
+namespace FileMonitor.Implementations
 {
     public class FileSystemMonitor
     {
@@ -11,7 +11,7 @@ namespace FileMonitor
         private FileSystemWatcher _watcher;
 
         private readonly string _directoryPath;
-        
+
         // TODO inject the URL, inject log filePath
         private readonly string _postEventUrl = "https://localhost:7174/FileSystemEventsHandler/PostEventLog";
 
@@ -85,32 +85,28 @@ namespace FileMonitor
         private async Task SendPostRequest(EventLog eventLog)
         {
             string eventLogAsjson = JsonConvert.SerializeObject(eventLog);
-            
+
             using (var client = new HttpClient())
             {
-                HttpContent content = new StringContent(eventLogAsjson, Encoding.UTF8, "application/json");
+                HttpContent messagePostContent = new StringContent(eventLogAsjson, Encoding.UTF8, "application/json");
 
                 try
                 {
-                    HttpResponseMessage response = await client.PostAsync(_postEventUrl, content);
-
-                    // Check if the request was successful
-                    if (response.IsSuccessStatusCode)
+                    HttpResponseMessage responseMsg = await client.PostAsync(_postEventUrl, messagePostContent);
+                    if (responseMsg.IsSuccessStatusCode)
                     {
-                        // Read response content as string
-                        string responseBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine("Response: " + responseBody);
+                        log.Info($"[{nameof(SendPostRequest)}] eventLog published successfully. " +
+                            $"eventLog: {eventLog}. statusCode: {responseMsg.StatusCode}.");
                     }
                     else
                     {
-                        // Print error status code
-                        Console.WriteLine("Error: " + response.StatusCode);
+                        log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. " +
+                            $"eventLog: {eventLog}. statusCode: {responseMsg.StatusCode}.");
                     }
                 }
-                catch (HttpRequestException e)
+                catch (Exception ex)
                 {
-                    // Print any exception that occurred
-                    Console.WriteLine("Error: " + e.Message);
+                    log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. error: {ex}.");
                 }
             }
         }

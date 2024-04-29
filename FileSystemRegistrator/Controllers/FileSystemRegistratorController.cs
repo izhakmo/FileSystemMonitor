@@ -1,4 +1,4 @@
-using FileMonitor;
+using FileMonitor.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileSystemRegistrator.Controllers

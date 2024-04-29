@@ -1,4 +1,4 @@
-﻿namespace FileMonitor
+﻿namespace FileMonitor.Interfaces
 {
     public interface IPrintEventLogs
     {

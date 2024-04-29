@@ -1,14 +1,11 @@
-using FileMonitor;
-using Moq;
 using System.Net;
+using FileMonitor.Implementations;
 
 namespace FileMonitorTestss
 {
     [TestClass]
     public class FileSystemWatcherMonitorTests
     {
-        ILogsManager _logsManager = new Mock<ILogsManager>().Object;
-
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "maxNumberOfFoldersToMonitor should be greather than 0.")]
         public void FileSystemWatcherMonitor_VerifyMaxNumberOfFoldersToMonitor_Fail_MustBeGreatherThen0()
@@ -81,11 +78,9 @@ namespace FileMonitorTestss
             var expectedStatusCode = HttpStatusCode.OK;
 
             HttpResponseMessage responseMessage = fileSystemWatcherMonitor.AddFolder(@"D:\");
-            Assert.AreEqual(responseMessage.StatusCode, expectedStatusCode, 
+            Assert.AreEqual(responseMessage.StatusCode, expectedStatusCode,
                 $"recevied status code: {responseMessage.StatusCode}, message: {responseMessage.Content}, " +
                 $"but expected status code {expectedStatusCode}");
         }
-
-        
     }
 }

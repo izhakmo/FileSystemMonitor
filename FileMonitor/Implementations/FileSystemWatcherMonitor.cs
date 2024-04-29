@@ -1,7 +1,8 @@
-﻿using log4net;
+﻿using FileMonitor.Interfaces;
+using log4net;
 using System.Net;
 
-namespace FileMonitor
+namespace FileMonitor.Implementations
 {
     public class FileSystemWatcherMonitor : IFileSystemWatcherMonitor
     {
@@ -68,7 +69,7 @@ namespace FileMonitor
         {
             log.Info($"[{nameof(RemoveFolder)}] folderPath: {folderPath}.");
             string folderPathLowerCase = folderPath.ToLower();
-            if (!(_pathToMonitor.ContainsKey(folderPathLowerCase)))
+            if (!_pathToMonitor.ContainsKey(folderPathLowerCase))
             {
                 string folderIsNotMonitoredMsg = $"folderPath: `{folderPathLowerCase}` is not monitored. {GetMonitoredFolders()}";
                 return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(folderIsNotMonitoredMsg) };
