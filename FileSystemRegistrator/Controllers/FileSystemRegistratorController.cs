@@ -8,35 +8,30 @@ namespace FileSystemRegistrator.Controllers
     public class FileSystemRegistratorController : ControllerBase
     {
         private readonly ILogger<FileSystemRegistratorController> _logger;
+        private IFileSystemWatcherMonitor _fileSystemWatcherMonitor;
 
 
-
-        public FileSystemRegistratorController(ILogger<FileSystemRegistratorController> logger)
+        // TODO add DI for the LogsManager
+        public FileSystemRegistratorController(
+            ILogger<FileSystemRegistratorController> logger, 
+            IFileSystemWatcherMonitor fileSystemWatcherMonitor)
         {
             _logger = logger;
+
+            LogsManager logsManager = new LogsManager();
+            _fileSystemWatcherMonitor = fileSystemWatcherMonitor;
         }
 
-        [HttpGet("Get")]
-        public IEnumerable<string> Get()
+        [HttpPost("AddFolder")]
+        public HttpResponseMessage AddFolder(string folderPath)
         {
-            return Enumerable.Range(1, 2).Select(index => new EventLogMsg(WatcherChangeTypes.Renamed, "ds", "ds").ToString())
-            .ToArray();
+            return _fileSystemWatcherMonitor.AddFolder(folderPath);
         }
 
-        [HttpGet("GetAll")]
-        public IEnumerable<string> GetAll()
+        [HttpPost("RemoveFolder")]
+        public HttpResponseMessage RemoveFolder(string folderPath)
         {
-            return new List<string> { "Item 1", "Item 2", "Item 3" };
-        }
-
-
-        // TODO remove the comment of the hidden Api
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        [HttpPost("PostEventLog")]
-        public IActionResult PostEventLog([FromBody] EventLogMsg eventLogMsg)
-        {
-            _logger.LogInformation($"Received event log message: {eventLogMsg}");
-            return Ok($"eventLogMsg: `{eventLogMsg}` received successfully.");
+            return _fileSystemWatcherMonitor.RemoveFolder(folderPath);
         }
     }
 }

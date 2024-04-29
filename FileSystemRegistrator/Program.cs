@@ -1,3 +1,5 @@
+using FileMonitor;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// TODO fix DI
+builder.Services.AddSingleton<IFileSystemWatcherMonitor>(_ => new FileSystemWatcherMonitor(3, new LogsManager()));
+
 
 var app = builder.Build();
 
