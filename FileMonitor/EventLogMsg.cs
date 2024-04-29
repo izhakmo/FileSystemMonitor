@@ -3,7 +3,7 @@
     public class EventLogMsg
     {
         private DateTime _time;
-        private string _changeTypeAsString ;
+        private string _changeTypeAsString;
         private string _folderPath;
         private string _fileName;
 
@@ -22,5 +22,7 @@
         {
             return $"[{_time}] eventType: {_changeTypeAsString}, folderPath: {_folderPath}, fileName: {_fileName}. {_logMsg}";
         }
+
+        public string GetChangeType() => _changeTypeAsString;
     }
 }

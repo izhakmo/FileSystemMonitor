@@ -8,23 +8,33 @@ namespace FileMonitor
         private readonly ILog log = LogManager.GetLogger(typeof(FileSystemMonitor));
         private FileSystemWatcher _watcher;
 
-        private readonly string _directoryPath;
-        private readonly string _generalLogFileName;
+        private ILogsManager _logsManager;
+        //private Dictionary<string, Stack<EventLogMsg>> _logsByChangeTypes;
 
-        public FileSystemMonitor(string directoryPath)
+        private readonly string _directoryPath;
+        //private readonly string _generalLogFileName;
+
+        public FileSystemMonitor(string directoryPath, ILogsManager logsManager)
         {
             BasicConfigurator.Configure();
 
             // TODO add fileName as input
-            _generalLogFileName = Consts.DefualtGeneralLogFileName;
+            //_generalLogFileName = Consts.DefualtGeneralLogFileName;
             _directoryPath = directoryPath;
             _watcher = new FileSystemWatcher(_directoryPath);
+            _logsManager = logsManager;
+
+            //_logsByChangeTypes = new Dictionary<string, Stack<EventLogMsg>>
+            //{
+            //    { Consts.AllLogsForFolderKey, new Stack<EventLogMsg>() }
+            //};
         }
 
         public void StartMonitoring()
         {
             // Configure log4net
             //XmlConfigurator.Configure();
+            log.Info($"start monitoring directory: {_directoryPath}");
 
             _watcher = new FileSystemWatcher(_directoryPath);
             // TODO do i want recursive monitoring?
@@ -41,21 +51,31 @@ namespace FileMonitor
             // Enable the watcher
             // TODO what is this?
             _watcher.EnableRaisingEvents = true;
-
-            log.Info($"start monitoring directory: {_directoryPath}");
         }
 
         public void StopMonitoring()
         {
+            log.Info($"stop monitoring directory: {_directoryPath}");
+
+            _watcher.EnableRaisingEvents = false;
+
             _watcher.Created -= OnFileChange;
             _watcher.Deleted -= OnFileChange;
             _watcher.Changed -= OnFileChange;
 
             _watcher.Renamed -= OnFileRename;
 
-            _watcher.EnableRaisingEvents = false;
+            _logsManager.RemoveMonitor(_directoryPath);
 
-            log.Info($"stop monitoring directory: {_directoryPath}");
+            //foreach (var a in _logsByChangeTypes)
+            //{
+            //    // TODO do i need to clear the queues and dictionary?
+            //    _logsByChangeTypes.Remove(a.Key);
+            //    a.Value.Clear();
+            //}
+
+            // TODO do i need to dispose????
+            _watcher.Dispose();
         }
 
         private void OnFileChange(object sender, FileSystemEventArgs e)
@@ -71,28 +91,27 @@ namespace FileMonitor
 
         private void LogChangesToFile(WatcherChangeTypes ChangeType, string filePath, string logMsg)
         {
-            //var time = DateTime.Now;
-            //var changeTypeAsString = ChangeType.GetType().Name;
-            //string folderPath = Path.GetDirectoryName(filePath);
-            //string fileName = Path.GetFileName(filePath);
 
-            //var updatedLogMsg = $"[{time}] eventType: {changeTypeAsString}, folderPath: {folderPath}, fileName: {fileName}. {logMsg}";
-
-            EventLogMsg eventLogMsg = new EventLogMsg(ChangeType,filePath,logMsg);
+            EventLogMsg eventLogMsg = new EventLogMsg(ChangeType, filePath, logMsg);
             log.Info($"{eventLogMsg}");
 
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(_generalLogFileName, true))
-                {
-                    writer.WriteLine($"{eventLogMsg}");
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error($"failed to write log to file: {_generalLogFileName}. " +
-                    $"expected log to write: {eventLogMsg}. error: {ex.Message}.");
-            }
+            _logsManager.Write(_directoryPath, eventLogMsg);
+
+            //_logsByChangeTypes.TryGetValue(Consts.AllLogsForFolderKey, out Stack<EventLogMsg> allLogsForFolder);
+            //allLogsForFolder.Push(eventLogMsg);
+
+            //if(_logsByChangeTypes.TryGetValue(ChangeType.ToString(), out Stack<EventLogMsg>? logsByTypeForFolder))
+            //{
+            //    // TODO add log here
+            //    logsByTypeForFolder.Push(eventLogMsg);
+            //}
+            //else
+            //{
+            //    // TODO add log here
+            //    logsByTypeForFolder = new Stack<EventLogMsg>();
+            //    logsByTypeForFolder.Push(eventLogMsg);
+            //    _logsByChangeTypes.Add(ChangeType.ToString(), logsByTypeForFolder);
+            //}
         }
     }
 }
