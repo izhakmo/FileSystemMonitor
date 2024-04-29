@@ -8,27 +8,40 @@ namespace FileSystemEventsHandler.Controllers
     public class FileSystemEventsHandlerController : ControllerBase
     {
         private readonly ILogger<FileSystemEventsHandlerController> _logger;
+        private IPrintEventLogs _printEventLogs;
 
 
-
-        public FileSystemEventsHandlerController(ILogger<FileSystemEventsHandlerController> logger)
+        public FileSystemEventsHandlerController(ILogger<FileSystemEventsHandlerController> logger, IPrintEventLogs printEventLogs)
         {
             _logger = logger;
+            _printEventLogs = printEventLogs;
         }
 
-        [HttpGet("Get")]
-        public IEnumerable<string> Get()
+        [HttpGet("PrintLastEvents")]
+        public IEnumerable<string> PrintLastEvents(int NumberOfLastEventsToPrint)
         {
-            return Enumerable.Range(1, 2).Select(index => new EventLog(WatcherChangeTypes.Renamed, "ds", "ds").ToString())
-            .ToArray();
+            return _printEventLogs.PrintLastEvents(NumberOfLastEventsToPrint);
         }
 
-        // TODO remove the comment of the hidden Api
-        //[ApiExplorerSettings(IgnoreApi = true)]
+
+        [HttpGet("PrintFolderLastEvents")]
+        public IEnumerable<string> PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint)
+        {
+            return _printEventLogs.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint);
+        }
+
+        [HttpGet("PrintFolderLastEvents")]
+        public IEnumerable<string> PrintFolderLastEvents(string folderPath, string eventType, int NumberOfLastEventsToPrint)
+        {
+            return _printEventLogs.PrintFolderLastEvents(folderPath, eventType, NumberOfLastEventsToPrint);
+        }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("PostEventLog")]
         public IActionResult PostEventLog([FromBody] EventLog eventLogMsg)
         {
             _logger.LogInformation($"Received event log message: {eventLogMsg}");
+            // TODO PostEventLog
             return Ok($"eventLogMsg: `{eventLogMsg}` received successfully.");
         }
     }

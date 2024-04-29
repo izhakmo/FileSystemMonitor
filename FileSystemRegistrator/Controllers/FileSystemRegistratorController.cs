@@ -10,15 +10,12 @@ namespace FileSystemRegistrator.Controllers
         private readonly ILogger<FileSystemRegistratorController> _logger;
         private IFileSystemWatcherMonitor _fileSystemWatcherMonitor;
 
-
-        // TODO add DI for the LogsManager
         public FileSystemRegistratorController(
             ILogger<FileSystemRegistratorController> logger, 
             IFileSystemWatcherMonitor fileSystemWatcherMonitor)
         {
             _logger = logger;
 
-            LogsManager logsManager = new LogsManager();
             _fileSystemWatcherMonitor = fileSystemWatcherMonitor;
         }
 
