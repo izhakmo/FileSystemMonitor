@@ -7,3 +7,5 @@
 /FileMonitor/obj/*
 /FileMonitorTests/bin/*
 /FileMonitorTests/obj/*
+/FileSystemEventsHandler/bin/*
+/FileSystemEventsHandler/obj/*
