@@ -2,27 +2,29 @@
 {
     public class EventLogMsg
     {
-        private DateTime _time;
-        private string _changeTypeAsString;
-        private string _folderPath;
-        private string _fileName;
+        public DateTime Time { get; set; }
+        public string ChangeType { get; set; }
+        public string FolderPath { get; set; }
+        public string FileName { get; set; }
 
-        private string _logMsg;
+        public string LogMsg { get; set; }
+
+        public EventLogMsg() { } // Parameterless constructor for serialization / deserialization 
 
         public EventLogMsg(WatcherChangeTypes ChangeType, string filePath, string logMsg)
         {
-            _time = DateTime.Now;
-            _changeTypeAsString = ChangeType.GetType().Name;
-            _folderPath = Path.GetDirectoryName(filePath);
-            _fileName = Path.GetFileName(filePath);
-            _logMsg = logMsg;
+            Time = DateTime.Now;
+            this.ChangeType = ChangeType.GetType().Name;
+            FolderPath = Path.GetDirectoryName(filePath);
+            FileName = Path.GetFileName(filePath);
+            LogMsg = logMsg;
         }
 
         public override string ToString()
         {
-            return $"[{_time}] eventType: {_changeTypeAsString}, folderPath: {_folderPath}, fileName: {_fileName}. {_logMsg}";
+            return $"[{Time}] eventType: {ChangeType}, folderPath: {FolderPath}, fileName: {FileName}. {LogMsg}";
         }
 
-        public string GetChangeType() => _changeTypeAsString;
+        public string GetChangeType() => ChangeType;
     }
 }
