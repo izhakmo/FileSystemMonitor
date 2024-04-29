@@ -10,7 +10,7 @@ namespace FileMonitor
 
         public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor)
         {
-            if (maxNumberOfFoldersToMonitor < 0)
+            if (maxNumberOfFoldersToMonitor < 1)
             {
                 throw new ArgumentException($"{nameof(maxNumberOfFoldersToMonitor)} should be greather than 0.");
             }

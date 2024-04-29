@@ -4,4 +4,6 @@
 
 /.vs
 /FileMonitor/bin/*
-/FileMonitor/obj
+/FileMonitor/obj/*
+/FileMonitorTests/bin/*
+/FileMonitorTests/obj/*
