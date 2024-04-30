@@ -29,7 +29,7 @@ namespace FileSystemEventsHandler.Controllers
         [HttpGet("PrintLastEvents")]
         public IActionResult PrintLastEvents(int NumberOfLastEventsToPrint)
         {
-            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.ValidateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
             if (!numberOfEventsValidator.isValidate)
             {
                 return BadRequest(numberOfEventsValidator.errorMsg);
@@ -41,7 +41,7 @@ namespace FileSystemEventsHandler.Controllers
         [HttpGet("PrintFolderLastEvents")]
         public IActionResult PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint)
         {
-            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.ValidateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
             if (!numberOfEventsValidator.isValidate)
             {
                 return BadRequest(numberOfEventsValidator.errorMsg);
@@ -54,12 +54,12 @@ namespace FileSystemEventsHandler.Controllers
         {
             var eventTypeToLower = eventType.ToLower();
 
-            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.ValidateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
             if (!numberOfEventsValidator.isValidate)
             {
                 return BadRequest(numberOfEventsValidator.errorMsg);
             }
-            var eventTypeValidator = _inputValidator.validateEventType(eventTypeToLower);
+            var eventTypeValidator = _inputValidator.ValidateEventType(eventTypeToLower);
             if (!eventTypeValidator.isValidate)
             {
                 return BadRequest(eventTypeValidator.errorMsg);

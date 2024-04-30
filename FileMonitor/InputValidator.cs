@@ -2,7 +2,7 @@
 {
     public class InputValidator
     {
-        public (bool isValidate, string errorMsg) validateNumberOfLastEventsToPrint(int NumberOfLastEventsToPrint)
+        public (bool isValidate, string errorMsg) ValidateNumberOfLastEventsToPrint(int NumberOfLastEventsToPrint)
         {
             if (NumberOfLastEventsToPrint < 1)
             {
@@ -13,7 +13,7 @@
             return (true, string.Empty);
         }
 
-        public (bool isValidate, string errorMsg) validateEventType(string eventTypeToLower)
+        public (bool isValidate, string errorMsg) ValidateEventType(string eventTypeToLower)
         {
             var knownEventTypes = new string[] { "created", "deleted", "changed", "renamed" };
             if (!(knownEventTypes.Contains(eventTypeToLower)))
