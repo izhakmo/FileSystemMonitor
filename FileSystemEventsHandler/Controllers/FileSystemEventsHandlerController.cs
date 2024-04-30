@@ -9,49 +9,68 @@ namespace FileSystemEventsHandler.Controllers
     public class FileSystemEventsHandlerController : ControllerBase
     {
         private readonly ILogger<FileSystemEventsHandlerController> _logger;
+        private readonly InputValidator _inputValidator;
         private IPrintEventLogs _printEventLogs;
         private ILogsCacheManager _logsManager;
 
 
         public FileSystemEventsHandlerController(
             ILogger<FileSystemEventsHandlerController> logger,
+            InputValidator inputValidator,
             IPrintEventLogs printEventLogs,
             ILogsCacheManager logsManager)
         {
             _logger = logger;
+            _inputValidator = inputValidator;
             _printEventLogs = printEventLogs;
             _logsManager = logsManager;
         }
 
         [HttpGet("PrintLastEvents")]
-        public IEnumerable<EventLog> PrintLastEvents(int NumberOfLastEventsToPrint)
+        public IActionResult PrintLastEvents(int NumberOfLastEventsToPrint)
         {
-            validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
-            return _printEventLogs.PrintLastEvents(NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            if (!numberOfEventsValidator.isValidate)
+            {
+                return BadRequest(numberOfEventsValidator.errorMsg);
+            }
+            return Ok(_printEventLogs.PrintLastEvents(NumberOfLastEventsToPrint));
         }
 
 
         [HttpGet("PrintFolderLastEvents")]
-        public IEnumerable<EventLog> PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint)
+        public IActionResult PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint)
         {
-            validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
-            return _printEventLogs.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            if (!numberOfEventsValidator.isValidate)
+            {
+                return BadRequest(numberOfEventsValidator.errorMsg);
+            }
+            return Ok(_printEventLogs.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint));
         }
 
         [HttpGet("PrintFolderLastEventsOfType")]
-        public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
+        public IActionResult PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
             var eventTypeToLower = eventType.ToLower();
 
-            validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
-            validateEventType(eventTypeToLower);
-            var lastItems =  _printEventLogs.PrintFolderLastEventsOfType(folderPath, eventTypeToLower, NumberOfLastEventsToPrint);
+            var numberOfEventsValidator = _inputValidator.validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
+            if (!numberOfEventsValidator.isValidate)
+            {
+                return BadRequest(numberOfEventsValidator.errorMsg);
+            }
+            var eventTypeValidator = _inputValidator.validateEventType(eventTypeToLower);
+            if (!eventTypeValidator.isValidate)
+            {
+                return BadRequest(eventTypeValidator.errorMsg);
+            }
+            var lastItems = _printEventLogs.PrintFolderLastEventsOfType(folderPath, eventTypeToLower, NumberOfLastEventsToPrint);
             foreach (var item in lastItems)
             {
                 _logger.LogInformation($"{item}");
             }
 
-            return lastItems;
+            return Ok(lastItems);
         }
 
 
@@ -63,26 +82,6 @@ namespace FileSystemEventsHandler.Controllers
 
             _logsManager.AddEventLogToCache(eventLog);
             return Ok($"eventLog: `{eventLog}` received successfully.");
-        }
-
-
-        // TODO move validators to a different class
-        private void validateNumberOfLastEventsToPrint(int NumberOfLastEventsToPrint)
-        {
-            if (NumberOfLastEventsToPrint < 1)
-            {
-                throw new ArgumentException($"NumberOfLastEventsToPrint is must be greather than 0. " +
-                    $"(received value: {NumberOfLastEventsToPrint}).");
-            };
-        }
-
-        private void validateEventType(string eventTypeToLower)
-        {
-            var knownEventTypes = new string[] { "created", "deleted", "changed", "renamed" };
-            if (!(knownEventTypes.Contains(eventTypeToLower)))
-            {
-                throw new ArgumentException($"Invalid eventType. received eventType: {eventTypeToLower}.");
-            };
         }
     }
 }

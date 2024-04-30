@@ -15,9 +15,7 @@ When a monitored folder is receiving an event - FileSystemRegistrator (the monit
 
 
 TODO:
-* Implement PrintEventLogs and the logs data stracture
-	* only `PrintLastEvents(int NumberOfLastEventsToPrint)` is implemented right now
-	* need to implement the two other functions as well
+* Improve PrintEventLogs data stractures
 * Write logs to files and not console
 * UT (there are really minimal UT right now)
 * Improve DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject here

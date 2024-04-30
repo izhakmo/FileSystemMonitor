@@ -13,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ILog>(_ => LogManager.GetLogger(nameof(FileMonitor)));
+builder.Services.AddSingleton<InputValidator>();
 builder.Services.AddSingleton<ILogsCacheManager, LogsCacheManager>();
 builder.Services.AddSingleton<IPrintEventLogs, PrintEventLogs>();
 

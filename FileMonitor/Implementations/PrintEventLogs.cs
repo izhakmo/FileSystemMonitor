@@ -21,9 +21,9 @@ namespace FileMonitor.Implementations
             return _logsManager.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint);
         }
 
-        public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
+        public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventTypeToLower, int NumberOfLastEventsToPrint)
         {
-            return _logsManager.PrintFolderLastEventsOfType(folderPath, eventType, NumberOfLastEventsToPrint);
+            return _logsManager.PrintFolderLastEventsOfType(folderPath, eventTypeToLower, NumberOfLastEventsToPrint);
         }
     }
 }
