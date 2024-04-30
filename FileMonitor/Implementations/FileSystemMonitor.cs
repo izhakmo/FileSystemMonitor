@@ -7,7 +7,6 @@ namespace FileMonitor.Implementations
 {
     public class FileSystemMonitor
     {
-        //private readonly ILog log = LogManager.GetLogger(typeof(FileSystemMonitor));
         private readonly ILog _log;
         private FileSystemWatcher _watcher;
 

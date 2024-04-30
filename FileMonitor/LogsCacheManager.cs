@@ -2,7 +2,6 @@
 
 namespace FileMonitor
 {
-    // TODO need to test class
     public class LogsCacheManager : ILogsCacheManager
     {
         // TODO - add logs for the class !!!!!!
