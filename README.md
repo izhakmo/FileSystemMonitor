@@ -15,8 +15,6 @@ When a monitored folder is receiving an event - FileSystemRegistrator (the monit
 
 
 TODO:
-* Write logs to files and not console
 * UT (there are some UTs right now, but need to add more)
 * Improve DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject to FileSystemWatcherMonitor, FileSystemMonitor - inject the URL, inject log filePath
 * Improve PrintEventLogs data stractures
-
