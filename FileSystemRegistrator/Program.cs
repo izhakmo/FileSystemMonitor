@@ -1,6 +1,7 @@
 using FileMonitor;
 using FileMonitor.Interfaces;
 using FileMonitor.Implementations;
+using log4net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // TODO fix DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject here
-builder.Services.AddSingleton<IFileSystemWatcherMonitor>(_ => new FileSystemWatcherMonitor(Consts.DefualtMaxNumberOfFoldersToMonitor));
+builder.Services.AddSingleton<ILog>(_ => LogManager.GetLogger(nameof(FileMonitor)));
+builder.Services.AddSingleton<IFileSystemWatcherMonitor>(provider =>
+{
+    ILog log = provider.GetRequiredService<ILog>();
+    return new FileSystemWatcherMonitor(Consts.DefualtMaxNumberOfFoldersToMonitor, log);
+});
 
 
 var app = builder.Build();

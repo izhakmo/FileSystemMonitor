@@ -1,22 +1,26 @@
 using System.Net;
 using FileMonitor.Implementations;
+using log4net;
+using Moq;
 
 namespace FileMonitorTestss
 {
     [TestClass]
     public class FileSystemWatcherMonitorTests
     {
+        private readonly ILog _log = new Mock<ILog>().Object;
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentException), "maxNumberOfFoldersToMonitor should be greather than 0.")]
         public void FileSystemWatcherMonitor_VerifyMaxNumberOfFoldersToMonitor_Fail_MustBeGreatherThen0()
         {
-            new FileSystemWatcherMonitor(0);
+            new FileSystemWatcherMonitor(0, _log);
         }
 
         [TestMethod]
         public async Task AddFolder_Fail_FolderAlreadyMonitored_StatusCodeConflict()
         {
-            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1);
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
             var expectedStatusCodeOne = HttpStatusCode.OK;
             var expectedStatusCodeTwo = HttpStatusCode.Conflict;
 
@@ -38,7 +42,7 @@ namespace FileMonitorTestss
         [TestMethod]
         public async Task AddFolder_Fail_MaxNumberOfFoldersMonitored_StatusCodeForbidden()
         {
-            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1);
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
             var expectedStatusCodeOne = HttpStatusCode.OK;
             var expectedStatusCodeTwo = HttpStatusCode.Forbidden;
 
@@ -60,7 +64,7 @@ namespace FileMonitorTestss
         [TestMethod]
         public async Task AddFolder_Fail_FolderDoesNotExist_StatusCodeBadRequest()
         {
-            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1);
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
             var expectedStatusCode = HttpStatusCode.BadRequest;
 
             HttpResponseMessage responseMessageFail = fileSystemWatcherMonitor.AddFolder(@"D:\fsdfds");
@@ -74,7 +78,7 @@ namespace FileMonitorTestss
         [TestMethod]
         public void AddFolder_Success_StatusCodeOK()
         {
-            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1);
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
             var expectedStatusCode = HttpStatusCode.OK;
 
             HttpResponseMessage responseMessage = fileSystemWatcherMonitor.AddFolder(@"D:\");

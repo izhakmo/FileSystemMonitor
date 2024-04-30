@@ -1,20 +1,23 @@
 ﻿using FileMonitor.Interfaces;
 using log4net;
+using log4net.Config;
 using System.Net;
 
 namespace FileMonitor.Implementations
 {
     public class FileSystemWatcherMonitor : IFileSystemWatcherMonitor
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(FileSystemWatcherMonitor));
+        //private readonly ILog log = LogManager.GetLogger(typeof(FileSystemWatcherMonitor));
+        private readonly ILog _log;
 
         private int _numberOfFolderCurrentlyMonitored = 0;
         private int _maxNumberOfFoldersToMonitor;
         private Dictionary<string, FileSystemMonitor> _pathToMonitor;
 
         // TODO create FileSystemMonitorFactory and inject here
-        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor)
+        public FileSystemWatcherMonitor(int maxNumberOfFoldersToMonitor, ILog log)
         {
+            _log = log;
             if (maxNumberOfFoldersToMonitor < 1)
             {
                 throw new ArgumentException($"{nameof(maxNumberOfFoldersToMonitor)} should be greather than 0.");
@@ -22,42 +25,44 @@ namespace FileMonitor.Implementations
 
             _maxNumberOfFoldersToMonitor = maxNumberOfFoldersToMonitor;
             _pathToMonitor = new Dictionary<string, FileSystemMonitor>();
+
+            BasicConfigurator.Configure();
         }
 
         public HttpResponseMessage AddFolder(string folderPath)
         {
-            log.Info($"[{nameof(AddFolder)}] folderPath: {folderPath}.");
+            _log.Info($"[{nameof(AddFolder)}] folderPath: {folderPath}.");
             string folderPathLowerCase = folderPath.ToLower();
             if (_pathToMonitor.ContainsKey(folderPathLowerCase))
             {
                 string folderAlreadyMonitoredMsg = $"folderPath: `{folderPathLowerCase}` is already monitored.";
-                log.Warn($"[{nameof(AddFolder)}] {folderAlreadyMonitoredMsg}.");
+                _log.Warn($"[{nameof(AddFolder)}] {folderAlreadyMonitoredMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.Conflict) { Content = new StringContent(folderAlreadyMonitoredMsg) };
             }
 
             if (_numberOfFolderCurrentlyMonitored >= _maxNumberOfFoldersToMonitor)
             {
                 string maxNumberOfFoldersMonitoredMsg = ReturnMaxNumberOfFoldersMonitoredResponse(folderPathLowerCase);
-                log.Warn($"[{nameof(AddFolder)}] {maxNumberOfFoldersMonitoredMsg}.");
+                _log.Warn($"[{nameof(AddFolder)}] {maxNumberOfFoldersMonitoredMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.Forbidden) { Content = new StringContent(maxNumberOfFoldersMonitoredMsg) };
             }
 
             try
             {
                 MonitorNewFolder(folderPathLowerCase);
-                log.Info($"[{nameof(AddFolder)}] folderPath: `{folderPathLowerCase}` added to Dictionary successfully.");
+                _log.Info($"[{nameof(AddFolder)}] folderPath: `{folderPathLowerCase}` added to Dictionary successfully.");
             }
             catch (ArgumentException ex)
             {
                 var folderDoesNotExistMsg = $"failed to monitor folderPath: `{folderPathLowerCase}`. " +
                 $"folder probably does not exist. error: {ex.Message}.";
-                log.Warn($"[{nameof(AddFolder)}] {folderDoesNotExistMsg}. {GetMonitoredFolders()}");
+                _log.Warn($"[{nameof(AddFolder)}] {folderDoesNotExistMsg}. {GetMonitoredFolders()}");
                 return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(folderDoesNotExistMsg) };
             }
             catch (Exception ex)
             {
                 var errorMsg = $"failed to monitor folderPath: `{folderPathLowerCase}`. error: {ex.Message}.";
-                log.Error($"[{nameof(AddFolder)}] {errorMsg}.");
+                _log.Error($"[{nameof(AddFolder)}] {errorMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(errorMsg) };
             }
 
@@ -67,7 +72,7 @@ namespace FileMonitor.Implementations
 
         public HttpResponseMessage RemoveFolder(string folderPath)
         {
-            log.Info($"[{nameof(RemoveFolder)}] folderPath: {folderPath}.");
+            _log.Info($"[{nameof(RemoveFolder)}] folderPath: {folderPath}.");
             string folderPathLowerCase = folderPath.ToLower();
             if (!_pathToMonitor.ContainsKey(folderPathLowerCase))
             {
@@ -77,12 +82,12 @@ namespace FileMonitor.Implementations
             try
             {
                 UnmonitorFolder(folderPathLowerCase);
-                log.Info($"[{nameof(RemoveFolder)}] folderPath: `{folderPathLowerCase}` removed from Dictionary successfully.");
+                _log.Info($"[{nameof(RemoveFolder)}] folderPath: `{folderPathLowerCase}` removed from Dictionary successfully.");
             }
             catch (Exception ex)
             {
                 var errorMsg = $"failed to unmonitor folderPath: `{folderPathLowerCase}`. error: {ex.Message}.";
-                log.Error($"[{nameof(RemoveFolder)}] {errorMsg}.");
+                _log.Error($"[{nameof(RemoveFolder)}] {errorMsg}.");
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(errorMsg) };
             }
 
@@ -92,7 +97,7 @@ namespace FileMonitor.Implementations
 
         private void MonitorNewFolder(string folderPathLowerCase)
         {
-            FileSystemMonitor fileSystemMonitor = new FileSystemMonitor(folderPathLowerCase);
+            FileSystemMonitor fileSystemMonitor = new FileSystemMonitor(folderPathLowerCase,_log);
             _numberOfFolderCurrentlyMonitored++;
 
             _pathToMonitor.Add(folderPathLowerCase, fileSystemMonitor);

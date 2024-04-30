@@ -10,13 +10,13 @@ namespace FileSystemEventsHandler.Controllers
     {
         private readonly ILogger<FileSystemEventsHandlerController> _logger;
         private IPrintEventLogs _printEventLogs;
-        private ILogsManager _logsManager;
+        private ILogsCacheManager _logsManager;
 
 
         public FileSystemEventsHandlerController(
             ILogger<FileSystemEventsHandlerController> logger,
             IPrintEventLogs printEventLogs,
-            ILogsManager logsManager)
+            ILogsCacheManager logsManager)
         {
             _logger = logger;
             _printEventLogs = printEventLogs;

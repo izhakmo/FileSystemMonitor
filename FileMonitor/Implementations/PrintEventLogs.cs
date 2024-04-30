@@ -4,9 +4,9 @@ namespace FileMonitor.Implementations
 {
     public class PrintEventLogs : IPrintEventLogs
     {
-        private ILogsManager _logsManager;
+        private ILogsCacheManager _logsManager;
 
-        public PrintEventLogs(ILogsManager logsManager)
+        public PrintEventLogs(ILogsCacheManager logsManager)
         {
             _logsManager = logsManager;
         }

@@ -7,7 +7,8 @@ namespace FileMonitor.Implementations
 {
     public class FileSystemMonitor
     {
-        private readonly ILog log = LogManager.GetLogger(typeof(FileSystemMonitor));
+        //private readonly ILog log = LogManager.GetLogger(typeof(FileSystemMonitor));
+        private readonly ILog _log;
         private FileSystemWatcher _watcher;
 
         private readonly string _directoryPath;
@@ -16,9 +17,9 @@ namespace FileMonitor.Implementations
         private readonly string _postEventUrl = "https://localhost:7174/FileSystemEventsHandler/PostEventLog";
 
 
-        public FileSystemMonitor(string directoryPath)
+        public FileSystemMonitor(string directoryPath, ILog log)
         {
-            BasicConfigurator.Configure();
+            _log = log;
 
             // Configure log4net
             //XmlConfigurator.Configure();
@@ -33,9 +34,7 @@ namespace FileMonitor.Implementations
 
         private void StartMonitoring()
         {
-            log.Info($"[{nameof(StartMonitoring)}] start monitoring directory: {_directoryPath}");
-
-            _watcher = new FileSystemWatcher(_directoryPath);
+            _log.Info($"[{nameof(StartMonitoring)}] start monitoring directory: {_directoryPath}");
 
             _watcher.Created += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
             _watcher.Deleted += (sender, e) => { _ = OnFileChangeAsync(sender, e); };
@@ -48,7 +47,7 @@ namespace FileMonitor.Implementations
 
         public void StopMonitoring()
         {
-            log.Info($"[{nameof(StopMonitoring)}] stop monitoring directory: {_directoryPath}");
+            _log.Info($"[{nameof(StopMonitoring)}] stop monitoring directory: {_directoryPath}");
 
             _watcher.EnableRaisingEvents = false;
 
@@ -77,7 +76,7 @@ namespace FileMonitor.Implementations
         {
 
             EventLog eventLog = new EventLog(ChangeType, filePath, logMsg);
-            log.Info($"[{nameof(PostFileEventLog)}] eventLog: {eventLog}.");
+            _log.Info($"[{nameof(PostFileEventLog)}] eventLog: {eventLog}.");
 
             await SendPostRequest(eventLog);
         }
@@ -95,18 +94,18 @@ namespace FileMonitor.Implementations
                     HttpResponseMessage responseMsg = await client.PostAsync(_postEventUrl, messagePostContent);
                     if (responseMsg.IsSuccessStatusCode)
                     {
-                        log.Info($"[{nameof(SendPostRequest)}] eventLog published successfully. " +
+                        _log.Info($"[{nameof(SendPostRequest)}] eventLog published successfully. " +
                             $"eventLog: {eventLog}. statusCode: {responseMsg.StatusCode}.");
                     }
                     else
                     {
-                        log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. " +
+                        _log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. " +
                             $"eventLog: {eventLog}. statusCode: {responseMsg.StatusCode}.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. error: {ex}.");
+                    _log.Error($"[{nameof(SendPostRequest)}] failed to published eventLog. error: {ex}.");
                 }
             }
         }

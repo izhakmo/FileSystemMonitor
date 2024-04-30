@@ -1,6 +1,6 @@
 ﻿namespace FileMonitor
 {
-    public interface ILogsManager
+    public interface ILogsCacheManager
     {
         void AddEventLogToCache(EventLog eventLog);
         IEnumerable<EventLog> PrintLastEvents(int NumberOfLastEventsToPrint);

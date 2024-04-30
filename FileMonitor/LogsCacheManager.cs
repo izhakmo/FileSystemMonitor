@@ -3,18 +3,20 @@
 namespace FileMonitor
 {
     // TODO need to test class
-    public class LogsManager : ILogsManager
+    public class LogsCacheManager : ILogsCacheManager
     {
         // TODO - add logs for the class !!!!!!
-        private readonly ILog log = LogManager.GetLogger(typeof(LogsManager));
+        //private readonly ILog _log = LogManager.GetLogger(typeof(LogsCacheManager));
+        private readonly ILog _log;
 
         private Stack<EventLog> _allEventLogs;
         private Dictionary<string, Dictionary<string, Stack<EventLog>>> _logsByPathByChangeTypes;
 
-        public LogsManager()
+        public LogsCacheManager(ILog log)
         {
             _allEventLogs = new Stack<EventLog>();
             _logsByPathByChangeTypes = new Dictionary<string, Dictionary<string, Stack<EventLog>>>();
+            _log = log;
         }
 
         public void AddEventLogToCache(EventLog eventLog)
@@ -80,12 +82,12 @@ namespace FileMonitor
                 TryGetValue(folderPath, out Dictionary<string, Stack<EventLog>> dictForReceivedPath);
             if (!isPathLogsExist)
             {
-                log.Info($"[{PrintFolderLastEventsOfType}] no logs for path: {folderPath}.");
+                _log.Info($"[{PrintFolderLastEventsOfType}] no logs for path: {folderPath}.");
                 return Enumerable.Empty<EventLog>();
             }
             Stack<EventLog> allLogsForReceivedPath = dictForReceivedPath.GetValueOrDefault(eventTypeToLower);
             var logsToReturn = allLogsForReceivedPath?.Take(NumberOfLastEventsToPrint) ?? Enumerable.Empty<EventLog>();
-            log.Info($"[{PrintFolderLastEventsOfType}] folderPath: {folderPath}, eventType: {eventTypeToLower}, " +
+            _log.Info($"[{PrintFolderLastEventsOfType}] folderPath: {folderPath}, eventType: {eventTypeToLower}, " +
                 $"numberOfLogsRequested:{NumberOfLastEventsToPrint}, returning {logsToReturn.Count()} logs.");
             return logsToReturn;
         }
