@@ -20,9 +20,6 @@ namespace FileMonitor.Implementations
         {
             _log = log;
 
-            // Configure log4net
-            //XmlConfigurator.Configure();
-
             // TODO add fileName as input
             //_generalLogFileName = Consts.DefualtGeneralLogFileName;
 

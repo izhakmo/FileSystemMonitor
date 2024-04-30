@@ -24,8 +24,6 @@ namespace FileMonitor.Implementations
 
             _maxNumberOfFoldersToMonitor = maxNumberOfFoldersToMonitor;
             _pathToMonitor = new Dictionary<string, FileSystemMonitor>();
-
-            BasicConfigurator.Configure();
         }
 
         public HttpResponseMessage AddFolder(string folderPath)
