@@ -14,7 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-BasicConfigurator.Configure();
+//BasicConfigurator.Configure();
+XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
 builder.Services.AddSingleton<ILog>(_ => LogManager.GetLogger(nameof(FileMonitor)));
 builder.Services.AddSingleton<InputValidator>();

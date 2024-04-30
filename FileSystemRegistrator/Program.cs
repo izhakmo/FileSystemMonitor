@@ -13,8 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// TODO fix DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject here
-BasicConfigurator.Configure();
+// TODO improve DI - inject maxNumberOfFoldersToMonitor, create FileSystemMonitorFactory and inject here
+//BasicConfigurator.Configure();
+XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
 builder.Services.AddSingleton<ILog>(_ => LogManager.GetLogger(nameof(FileMonitor)));
 builder.Services.AddSingleton<IFileSystemWatcherMonitor>(provider =>
 {
