@@ -41,9 +41,11 @@ namespace FileSystemEventsHandler.Controllers
         [HttpGet("PrintFolderLastEventsOfType")]
         public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
+            var eventTypeToLower = eventType.ToLower();
+
             validateNumberOfLastEventsToPrint(NumberOfLastEventsToPrint);
-            validateEventType(eventType);
-            var lastItems =  _printEventLogs.PrintFolderLastEventsOfType(folderPath, eventType, NumberOfLastEventsToPrint);
+            validateEventType(eventTypeToLower);
+            var lastItems =  _printEventLogs.PrintFolderLastEventsOfType(folderPath, eventTypeToLower, NumberOfLastEventsToPrint);
             foreach (var item in lastItems)
             {
                 _logger.LogInformation($"{item}");
@@ -74,12 +76,12 @@ namespace FileSystemEventsHandler.Controllers
             };
         }
 
-        private void validateEventType(string eventType)
+        private void validateEventType(string eventTypeToLower)
         {
             var knownEventTypes = new string[] { "created", "deleted", "changed", "renamed" };
-            if (!(knownEventTypes.Contains(eventType.ToLower())))
+            if (!(knownEventTypes.Contains(eventTypeToLower)))
             {
-                throw new ArgumentException($"Invalid eventType. received eventType: {eventType}.");
+                throw new ArgumentException($"Invalid eventType. received eventType: {eventTypeToLower}.");
             };
         }
     }

@@ -22,9 +22,9 @@
 
         public override string ToString()
         {
-            return $"[{Time}] eventType: {ChangeType}, folderPath: {FolderPath}, fileName: {FileName}. {LogMsg}";
+            return $"[{Time}] eventType: {ChangeType.ToLower()}, folderPath: {FolderPath}, fileName: {FileName}. {LogMsg}";
         }
 
-        public string GetChangeType() => ChangeType;
+        public string GetChangeType() => ChangeType.ToLower();
     }
 }

@@ -75,6 +75,7 @@ namespace FileMonitor
 
         public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
+            var eventTypeToLower = eventType.ToLower();
             bool isPathLogsExist = _logsByPathByChangeTypes.
                 TryGetValue(folderPath, out Dictionary<string, Stack<EventLog>> dictForReceivedPath);
             if (!isPathLogsExist)
@@ -82,9 +83,9 @@ namespace FileMonitor
                 log.Info($"[{PrintFolderLastEventsOfType}] no logs for path: {folderPath}.");
                 return Enumerable.Empty<EventLog>();
             }
-            Stack<EventLog> allLogsForReceivedPath = dictForReceivedPath.GetValueOrDefault(eventType);
+            Stack<EventLog> allLogsForReceivedPath = dictForReceivedPath.GetValueOrDefault(eventTypeToLower);
             var logsToReturn = allLogsForReceivedPath?.Take(NumberOfLastEventsToPrint) ?? Enumerable.Empty<EventLog>();
-            log.Info($"[{PrintFolderLastEventsOfType}] folderPath: {folderPath}, eventType: {eventType}, " +
+            log.Info($"[{PrintFolderLastEventsOfType}] folderPath: {folderPath}, eventType: {eventTypeToLower}, " +
                 $"numberOfLogsRequested:{NumberOfLastEventsToPrint}, returning {logsToReturn.Count()} logs.");
             return logsToReturn;
         }
