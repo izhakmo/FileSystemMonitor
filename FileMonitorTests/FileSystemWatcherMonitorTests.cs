@@ -86,5 +86,32 @@ namespace FileMonitorTestss
                 $"recevied status code: {responseMessage.StatusCode}, message: {responseMessage.Content}, " +
                 $"but expected status code {expectedStatusCode}");
         }
+
+        [TestMethod]
+        public void RemoveFolder_Fail_FolderIsNotMonitored_StatusCodeBadRequest()
+        {
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
+            var expectedStatusCode = HttpStatusCode.BadRequest;
+
+            HttpResponseMessage removeFolderResponseMessage = fileSystemWatcherMonitor.RemoveFolder(@"D:\");
+            Assert.AreEqual(removeFolderResponseMessage.StatusCode, expectedStatusCode,
+                $"recevied status code: {removeFolderResponseMessage.StatusCode}, message: {removeFolderResponseMessage.Content}, " +
+                $"but expected status code {expectedStatusCode}");
+        }
+
+
+        [TestMethod]
+        public void RemoveFolder_Success_StatusCodeOK()
+        {
+            var fileSystemWatcherMonitor = new FileSystemWatcherMonitor(1, _log);
+            var expectedStatusCode = HttpStatusCode.OK;
+
+            HttpResponseMessage addFolderResponseMessage = fileSystemWatcherMonitor.AddFolder(@"D:\");
+
+            HttpResponseMessage removeFolderResponseMessage = fileSystemWatcherMonitor.RemoveFolder(@"D:\");
+            Assert.AreEqual(removeFolderResponseMessage.StatusCode, expectedStatusCode,
+                $"recevied status code: {removeFolderResponseMessage.StatusCode}, message: {removeFolderResponseMessage.Content}, " +
+                $"but expected status code {expectedStatusCode}");
+        }
     }
 }
