@@ -1,6 +1,7 @@
-﻿using log4net;
+﻿using FileMonitor.Interfaces;
+using log4net;
 
-namespace FileMonitor
+namespace FileMonitor.Implementations
 {
     public class LogsCacheManager : ILogsCacheManager
     {
