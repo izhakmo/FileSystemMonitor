@@ -5,7 +5,6 @@ namespace FileMonitor
     public class LogsCacheManager : ILogsCacheManager
     {
         // TODO - add logs for the class !!!!!!
-        //private readonly ILog _log = LogManager.GetLogger(typeof(LogsCacheManager));
         private readonly ILog _log;
 
         private Stack<EventLog> _allEventLogs;
