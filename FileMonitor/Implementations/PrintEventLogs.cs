@@ -18,12 +18,12 @@ namespace FileMonitor.Implementations
 
         public IEnumerable<EventLog> PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint)
         {
-            throw new NotImplementedException();
+            return _logsManager.PrintFolderLastEvents(folderPath, NumberOfLastEventsToPrint);
         }
 
         public IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint)
         {
-            throw new NotImplementedException();
+            return _logsManager.PrintFolderLastEventsOfType(folderPath, eventType, NumberOfLastEventsToPrint);
         }
     }
 }

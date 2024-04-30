@@ -4,7 +4,7 @@
     {
         void AddEventLogToCache(EventLog eventLog);
         IEnumerable<EventLog> PrintLastEvents(int NumberOfLastEventsToPrint);
-
-        // TODO implement the 2 other functions
+        IEnumerable<EventLog> PrintFolderLastEvents(string folderPath, int NumberOfLastEventsToPrint);
+        IEnumerable<EventLog> PrintFolderLastEventsOfType(string folderPath, string eventType, int NumberOfLastEventsToPrint);
     }
 }
